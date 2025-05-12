@@ -1,0 +1,42 @@
+# Python
+_pycache_/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+*.db
+*.egg
+*.egg-info/
+dist/
+build/
+env/
+venv/
+.venv/
+
+# Byte-compiled / cache
+*.pyc
+*.pyo
+*.pyd
+
+# VS Code
+.vscode/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+desktop.ini
+
+# Env vars
+.env
+.env.*
+
+# Pip freeze / lock
+poetry.lock
+Pipfile.lock
+
+# Telegram bot sessions
+*.session
+*.session-journal
