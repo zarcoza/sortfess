@@ -17,7 +17,7 @@ def hashtag_info() -> str:
     info = "\n".join([f"• <b>{tag}</b> → {desc}" for tag, desc in VALID_HASHTAGS.items()])
     return info
 
-@router.message(commands=["start"])
+@router.message(Command("start"))
 async def start_cmd(message: types.Message):
     add_user(message.from_user.id, message.from_user.username or "")
     await message.answer_photo(
