@@ -1,5 +1,6 @@
 from aiogram import Router, types
 from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
+from aiogram.filters import Command
 from db import add_user
 from config import REQUIRED_CHANNELS, VALID_HASHTAGS
 
