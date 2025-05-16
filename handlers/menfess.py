@@ -1,63 +1,69 @@
 from aiogram import Router, types, F
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from filters import contains_bad_word
 from config import VALID_HASHTAGS, CHANNEL_ID
 from utils import check_subscription, get_post_status
 from handlers.start import sub_keyboard
 from db import add_user
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 
 router = Router()
 
 def report_keyboard() -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup().add(
-        InlineKeyboardButton("★ Laporkan ke Admin", url="https://t.me/anxtariksa")
-    )
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton("★ Laporkan ke Admin", url="https://t.me/anxtariksa")]
+    ])
 
 @router.message(F.text)
 async def handle_menfess(message: types.Message):
-    # simpan user
-    add_user(message.from_user.id, message.from_user.username or "")
-    
-    # cek subscribe
-    if not await check_subscription(message.from_user.id):
+    user_id = message.from_user.id
+    username = message.from_user.username or ""
+    text: str = message.text.strip()
+
+    # simpan user ke database
+    add_user(user_id, username)
+
+    # cek status base (buka/tutup)
+    if not get_post_status():
+        return await message.reply("Base lagi rehat beb. Nanti balik lagi ya~ 😴")
+
+    # cek langganan channel
+    if not await check_subscription(user_id):
         return await message.reply(
-            "Eits, belum join base nih!\nYuk follow dulu channel kita biar bisa kirim menfess.",
+            "Eits, belum join base nih!\nYuk follow dulu channel kita biar bisa kirim menfess 🤍",
             reply_markup=sub_keyboard()
         )
 
-    text = message.text.strip()
+    # validasi panjang pesan minimal (hindari spam kosong)
+    if len(text) < 10:
+        return await message.reply("Pesanmu terlalu pendek kak, coba tambahkan lebih banyak ya~ ✍️")
 
-    # cek kata kotor
+    # deteksi kata kotor
     if contains_bad_word(text):
         return await message.reply("Ups, no toxic zone ya ma bro. Jaga omongan dong~")
 
-    # cek hashtag
+    # cek hashtag valid
     text_lower = text.lower()
     if not any(tag in text_lower for tag in VALID_HASHTAGS):
-        return await message.reply(
-            "Tambahin hashtag dulu dong guys. Contoh: #sorta yh ok ckp tw"
-        )
+        return await message.reply("Tambahin hashtag dulu dong \nContoh: #sorta pengen martabak")
 
-    # cek typo hashtag
-    wrong = [w for w in text_lower.split() if w.startswith('#') and w not in VALID_HASHTAGS]
-    if wrong:
-        return await message.reply("Hashtagmu salah nih, cek kembali ya!")
+    # cek kesalahan hashtag
+    wrong_tags = [w for w in text_lower.split() if w.startswith('#') and w not in VALID_HASHTAGS]
+    if wrong_tags:
+        return await message.reply("Kayaknya ada typo di hashtag kamu deh \nCek lagi yaa!")
 
-    # cek status open/close
-    if not get_post_status():
-        return await message.reply("Base lagi rehat beb. Nanti balik lagi ya~")
+    # deteksi #gonna (tampilkan username asli)
+    show_username = '#gonna' in text_lower
 
-    # ======== LOGIKA TAMBAHAN UNTUK #gonna ========
-    show_username = False
-    if '#gonna' in text_lower:
-        show_username = True
-
-    # format pesan untuk dikirim ke channel
     if show_username:
-        forward = f"{message.text}\n\nDipost oleh: @{message.from_user.username or 'noname'}"
+        mention = f"@{username}" if username else f"<a href='tg://user?id={user_id}'>User Tanpa Username</a>"
+        forward_text = f"{message.text}\n\n📢 Dipost oleh: {mention}"
     else:
-        forward = f"{message.text}\n\nAnonim by: 🕶 {message.from_user.mention_html()}"
+        forward_text = f"{message.text}\n\n🕶 Anonim by: {message.from_user.mention_html()}"
 
     # kirim ke channel
-    await message.bot.send_message(chat_id=CHANNEL_ID, text=forward, reply_markup=report_keyboard())
-    await message.reply("Done kak! Fess kamu udah terbang ke base!")
+    await message.bot.send_message(
+        chat_id=CHANNEL_ID,
+        text=forward_text,
+        reply_markup=report_keyboard()
+    )
+    await message.reply("Done kak! Fess kamu udah terbang ke base ✈️")
