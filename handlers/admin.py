@@ -9,14 +9,14 @@ import logging
 router = Router()
 
 def is_admin(user_id: int) -> bool:
-    return user_id in ADMIN_IDS
+    return int(user_id) in ADMIN_IDS  # pastikan user_id dibandingkan sebagai int
 
-@router.message(F.text.startswith("/broadcast"))
+@router.message(F.text.func(lambda text: text and text.startswith("/broadcast")))
 async def broadcast_handler(message: types.Message):
     if not is_admin(message.from_user.id):
         return await message.reply("Kamu bukan admin, sayang 🤍")
 
-    msg = message.text.removeprefix("/broadcast").strip()
+    msg = message.text[len("/broadcast"):].strip()
     if not msg:
         return await message.reply("Isi dulu dong pesannya.\nContoh: /broadcast Halo semua!")
 
@@ -28,7 +28,7 @@ async def broadcast_handler(message: types.Message):
         try:
             await message.bot.send_message(uid, f"📢 <b>Broadcast:</b>\n\n{msg}")
             sent += 1
-            await asyncio.sleep(0.05)  # delay agar tidak kena flood
+            await asyncio.sleep(0.05)
         except (TelegramForbiddenError, TelegramBadRequest, TelegramNotFound):
             failed += 1
         except TelegramRetryAfter as e:
@@ -40,7 +40,7 @@ async def broadcast_handler(message: types.Message):
 
     await message.reply(f"📣 Broadcast selesai!\n👥 Total user: {total}\n✅ Berhasil: {sent}\n❌ Gagal: {failed}")
 
-@router.message(F.text.startswith("/balas"))
+@router.message(F.text.func(lambda text: text and text.startswith("/balas")))
 async def reply_user(message: types.Message):
     if not is_admin(message.from_user.id):
         return await message.reply("Cuma admin yang bisa balas DM.")
@@ -57,7 +57,7 @@ async def reply_user(message: types.Message):
     except Exception as e:
         await message.reply(f"Gagal kirim pesan ke user. Error: {e}")
 
-@router.message(F.text.in_(["/tutup", "/buka"]))
+@router.message(F.text.in_({"/tutup", "/buka"}))
 async def toggle_post(message: types.Message):
     if not is_admin(message.from_user.id):
         return await message.reply("Kamu ga punya akses, bestie.")
