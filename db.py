@@ -1,24 +1,34 @@
 import sqlite3
 import os
+from typing import List, Optional
 
-DB_PATH = os.path.join(os.path.dirname(__file__), 'data', 'users.db')
-os.makedirs(os.path.dirname(DB_PATH), exist_ok=True)
+DB_DIR = os.path.join(os.path.dirname(__file__), 'data')
+DB_PATH = os.path.join(DB_DIR, 'users.db')
 
-conn = sqlite3.connect(DB_PATH, check_same_thread=False)
-c = conn.cursor()
+os.makedirs(DB_DIR, exist_ok=True)
 
-c.execute('''
-CREATE TABLE IF NOT EXISTS users (
-    id INTEGER PRIMARY KEY,
-    username TEXT
-)
-''')
-conn.commit()
+def get_connection() -> sqlite3.Connection:
+    return sqlite3.connect(DB_PATH, check_same_thread=False)
 
-def add_user(user_id: int, username: str):
-    c.execute("INSERT OR IGNORE INTO users (id, username) VALUES (?, ?)", (user_id, username))
+# Inisialisasi tabel saat modul di-load
+with get_connection() as conn:
+    conn.execute('''
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY,
+            username TEXT
+        )
+    ''')
     conn.commit()
 
-def get_all_users() -> list[int]:
-    c.execute("SELECT id FROM users")
-    return [row[0] for row in c.fetchall()]
+def add_user(user_id: int, username: Optional[str]):
+    with get_connection() as conn:
+        conn.execute(
+            "INSERT OR IGNORE INTO users (id, username) VALUES (?, ?)",
+            (user_id, username)
+        )
+        conn.commit()
+
+def get_all_users() -> List[int]:
+    with get_connection() as conn:
+        cursor = conn.execute("SELECT id FROM users")
+        return [row[0] for row in cursor.fetchall()]
