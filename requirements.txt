@@ -1,1 +1,7 @@
-aiogram==3.2.0
+iogram==3.2.0
+python-dotenv>=1.0.1      # untuk load variabel dari .env
+aiohttp>=3.9.5            # untuk HTTP request (dependensi Aiogram)
+requests>=2.31.0          # kalau kamu butuh fetch API tambahan
+uvloop; sys_platform != 'win32'  # opsional: mempercepat event loop di Linux/macOS
+aiosqlite>=0.19.0         # kalau mau pakai SQLite async (opsional)
+async-timeout>=4.0.3      # untuk pengaturan timeout async
