@@ -1,4 +1,4 @@
-iogram==3.2.0
+aiogram==3.2.0
 python-dotenv>=1.0.1      # untuk load variabel dari .env
 aiohttp>=3.9.5            # untuk HTTP request (dependensi Aiogram)
 requests>=2.31.0          # kalau kamu butuh fetch API tambahan
