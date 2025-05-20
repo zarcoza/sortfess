@@ -3,7 +3,7 @@ from aiogram import Bot, Dispatcher
 from aiogram.enums import ParseMode
 from config import BOT_TOKEN
 
-# Import router dari handler
+# Import semua router handler
 from handlers.start import router as start_router
 from handlers.menfess import router as menfess_router
 from handlers.admin import router as admin_router
@@ -17,15 +17,16 @@ dp.include_router(start_router)
 dp.include_router(menfess_router)
 dp.include_router(admin_router)
 
-# Fungsi utama menjalankan bot
+# Fungsi utama
 async def main():
     print("🤖 Bot Sort Menfess sedang berjalan...")
     try:
-        await dp.start_polling(bot, polling_timeout=30)  # polling timeout untuk hindari spam getUpdates
+        await dp.start_polling(bot, polling_timeout=30)
     except Exception as e:
         print(f"❌ Error saat polling: {e}")
-        await bot.session.close()  # pastikan sesi bot ditutup dengan baik
+    finally:
+        await bot.session.close()
 
-# Menjalankan bot
+# Jalankan jika file ini sebagai entry-point
 if __name__ == "__main__":
     asyncio.run(main())
