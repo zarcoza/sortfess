@@ -1,30 +1,51 @@
 from aiogram import Bot
-from config import REQUIRED_CHANNELS
+from aiogram.types import ChatMember
 from aiogram.exceptions import TelegramForbiddenError, TelegramBadRequest
+from config import REQUIRED_CHANNELS
 
-# ✅ Status apakah pengguna boleh kirim menfess
+# Status apakah fitur menfess dibuka atau tidak
 _POST_STATUS = {"is_open": True}
 
 def set_post_status(status: bool):
-    """Set status POST (True = buka menfess, False = tutup)."""
+    """
+    Mengatur status apakah fitur menfess dibuka atau ditutup.
+
+    Args:
+        status (bool): True untuk membuka, False untuk menutup.
+    """
     _POST_STATUS["is_open"] = status
 
 def get_post_status() -> bool:
-    """Ambil status apakah menfess sedang dibuka atau tidak."""
+    """
+    Mengambil status apakah fitur menfess sedang dibuka.
+
+    Returns:
+        bool: True jika dibuka, False jika ditutup.
+    """
     return _POST_STATUS["is_open"]
 
 async def check_subscription(user_id: int) -> bool:
     """
-    Cek apakah user sudah subscribe ke semua channel yang diwajibkan.
-    Jika salah satu belum, return False.
+    Memeriksa apakah user sudah subscribe ke semua channel wajib.
+
+    Args:
+        user_id (int): ID pengguna Telegram.
+
+    Returns:
+        bool: True jika user sudah subscribe ke semua channel, False jika belum atau gagal cek.
     """
     bot = Bot.get_current()
-    for ch in REQUIRED_CHANNELS:
+
+    for channel_id in REQUIRED_CHANNELS:
         try:
-            member = await bot.get_chat_member(chat_id=ch, user_id=user_id)
-            if member.status not in ['member', 'administrator', 'creator']:
+            member: ChatMember = await bot.get_chat_member(chat_id=channel_id, user_id=user_id)
+            if member.status not in {"member", "administrator", "creator"}:
                 return False
         except (TelegramForbiddenError, TelegramBadRequest):
-            # Jika channel tidak valid, atau bot tidak punya akses
+            # Bot tidak punya akses atau channel tidak valid
             return False
+        except Exception:
+            # Error tak terduga, asumsikan belum subscribe
+            return False
+
     return True
