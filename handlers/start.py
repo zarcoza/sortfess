@@ -1,15 +1,13 @@
 from aiogram import Router, types, Bot
-from aiogram.types import (
-    InlineKeyboardMarkup, InlineKeyboardButton,
-    CallbackQuery
-)
-from aiogram.filters import Command, Filter
-from aiogram import F  # ⬅️ tambahkan ini
+from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton, CallbackQuery
+from aiogram.filters import Command
+from aiogram import F
 from db import add_user
 from config import REQUIRED_CHANNELS, VALID_HASHTAGS
 
 router = Router()
-BASE_CHANNEL_ID = -1002538940104  # ID channel @sortfess
+
+BASE_CHANNEL_ID = -1002538940104
 
 def sub_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
@@ -55,26 +53,9 @@ async def check_subscription(callback: CallbackQuery, bot: Bot):
             all_joined = False
             break
 
+    await callback.answer()
     if all_joined:
         await callback.message.edit_reply_markup()
         await callback.message.answer("☆ Oke kamu sudah subscribe, bisa mulai ngirim menfess yaa!")
     else:
         await callback.message.answer("𖦹 Waduh kamu belum subscribe nih, subscribe dulu yaa!", reply_markup=sub_keyboard())
-
-@router.message()
-async def handle_menfess(message: types.Message, bot: Bot):
-    if not message.text:
-        return
-
-    for tag in VALID_HASHTAGS:
-        if tag in message.text.lower():
-            try:
-                await bot.send_message(
-                    chat_id=BASE_CHANNEL_ID,
-                    text=message.text,
-                    parse_mode="HTML"
-                )
-                await message.reply("☆ Menfess kamu sudah terkirim ke channel!")
-            except Exception:
-                await message.reply("𖦹 Gagal mengirim menfess. Coba lagi nanti.")
-            break  # hanya kirim 1x
