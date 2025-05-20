@@ -15,7 +15,7 @@ router = Router()
 
 def report_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton("★ Laporkan ke Admin", url="https://t.me/anxtariksa")]
+        [InlineKeyboardButton(text="★ Laporkan ke Admin", url="https://t.me/anxtariksa")]
     ])
 
 @router.message(F.text)
