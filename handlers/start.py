@@ -29,7 +29,7 @@ async def start_cmd(message: types.Message) -> None:
     )
     
     await message.answer_photo(
-        photo="https://yourbannerurl.com/banner.jpg",
+        photo="https://www.canva.com/design/DAGn80RRK1c/9ODMliHdquzS6niy0qtgBA/edit?ui=eyJBIjp7fX0",
         caption=caption_text,
         reply_markup=sub_keyboard(),
         parse_mode="HTML"
