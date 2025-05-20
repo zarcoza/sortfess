@@ -64,10 +64,12 @@ async def check_subscription(callback: CallbackQuery, bot: Bot):
         await callback.message.edit_reply_markup()
         await callback.message.answer(
             "☆ Oke kamu sudah subscribe, bisa mulai ngirim menfess yaa!",
-            reply_markup=info_keyboard()
+            reply_markup=info_keyboard(),
+            parse_mode="HTML"
         )
     else:
         await callback.message.answer(
             "𖦹 Waduh kamu belum subscribe nih, subscribe dulu yaa!",
-            reply_markup=sub_keyboard()
+            reply_markup=sub_keyboard(),
+            parse_mode="HTML"
         )
