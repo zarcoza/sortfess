@@ -189,10 +189,12 @@ async def handle_sticker_menfess(message: types.Message, bot: Bot):
 
     log_post(user_id, "[STIKER]")
 
-    await bot.send_sticker(
-        chat_id=CHANNEL_ID,
-        sticker=message.sticker.file_id,
-        reply_markup=report_keyboard()
+    await bot.send_message(
+    chat_id=CHANNEL_ID,
+    text=forward_text,
+    reply_markup=report_keyboard(),
+    parse_mode="HTML",
+    message_thread_id=None  # jika grupnya bukan forum, ini boleh None atau dihapus
     )
 
     # Jika ingin menambah teks di channel untuk stiker, bisa diisi, jika tidak hapus saja yang di bawah.
