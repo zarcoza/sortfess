@@ -7,7 +7,7 @@ REQUIRED_CHANNELS = ['@sortfess', '@fiIIyourheart']
 VALID_HASHTAGS = {
     '#sorta': 'Kirim menfess bebas rp/rl',
     '#kinda': 'Buat sambat/curhat',
-    '#tellem!': 'Buat yang berbau tabu & horror (NSFW, TW, hal-hal diluar nalar, dll)',
+    '#tellem': 'Buat yang berbau tabu & horror (NSFW, TW, hal-hal diluar nalar, dll)',
     '#gonna': 'Menfess terbuka dengan nama asli, bisa ditujukan ke orang-orang tertentu',
     '#wanna': 'Hashtag buat yang mau nanya biar dapet solusi'
 }
