@@ -66,8 +66,10 @@ async def handle_menfess(message: types.Message):
 
     # kirim ke channel
     await message.bot.send_message(
-        chat_id=CHANNEL_ID,
-        text=forward_text,
-        reply_markup=report_keyboard()
+    chat_id=CHANNEL_ID,
+    text=forward_text,
+    reply_markup=report_keyboard(),
+    parse_mode="HTML" # ⬅️ Tambahkan ini
     )
+    
     await message.reply("Done kak! Fess kamu udah terbang ke base ✈️")
