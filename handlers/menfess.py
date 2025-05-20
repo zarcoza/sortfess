@@ -1,5 +1,4 @@
 from aiogram import Router, types, F, Bot
-from aiogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from filters import contains_bad_word
 from config import VALID_HASHTAGS, CHANNEL_ID
 from utils import check_subscription, get_post_status
@@ -62,14 +61,11 @@ async def handle_text_menfess(message: types.Message, bot: Bot):
     else:
         forward_text = f"{message.text}"
 
-    print("Akan mengirim ke channel:", CHANNEL_ID)
     await bot.send_message(
         chat_id=CHANNEL_ID,
         text=forward_text,
-        reply_markup=report_keyboard(),
         parse_mode="HTML"
     )
-    print("Sudah mengirim ke channel.")
 
     await message.reply("Done kak! Fess kamu udah terbang ke base ✈️")
 
@@ -103,7 +99,6 @@ async def handle_photo_menfess(message: types.Message, bot: Bot):
         chat_id=CHANNEL_ID,
         photo=photo,
         caption=f"{caption}",
-        reply_markup=report_keyboard(),
         parse_mode="HTML"
     )
     await message.reply("Pesan kamu sudah dikirim ke base!")
@@ -134,7 +129,6 @@ async def handle_document_menfess(message: types.Message, bot: Bot):
         chat_id=CHANNEL_ID,
         document=message.document.file_id,
         caption=f"{caption}",
-        reply_markup=report_keyboard(),
         parse_mode="HTML"
     )
     await message.reply("Dokumen kamu sudah dikirim ke base!")
@@ -162,7 +156,6 @@ async def handle_voice_menfess(message: types.Message, bot: Bot):
         chat_id=CHANNEL_ID,
         voice=message.voice.file_id,
         caption=f"{caption}",
-        reply_markup=report_keyboard(),
         parse_mode="HTML"
     )
     await message.reply("Voice note kamu udah dikirim ke base!")
@@ -184,19 +177,15 @@ async def handle_sticker_menfess(message: types.Message, bot: Bot):
 
     log_post(user_id, "[STIKER]")
 
-    await bot.send_message(
-    chat_id=CHANNEL_ID,
-    text=forward_text,
-    reply_markup=report_keyboard(),
-    parse_mode="HTML",
-    message_thread_id=None  # jika grupnya bukan forum, ini boleh None atau dihapus
+    await bot.send_sticker(
+        chat_id=CHANNEL_ID,
+        sticker=message.sticker.file_id
     )
 
-    # Jika ingin menambah teks di channel untuk stiker, bisa diisi, jika tidak hapus saja yang di bawah.
+    # Jika ingin mengirim pesan teks untuk stiker, tambahkan bot.send_message di bawah.
     # await bot.send_message(
     #     chat_id=CHANNEL_ID,
-    #     text=caption,
-    #     parse_mode="HTML"
+    #     text="🧩 Stiker dari pengguna anonim"
     # )
 
     await message.reply("Stiker kamu udah dikirim ke base!")
