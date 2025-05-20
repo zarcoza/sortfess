@@ -1,5 +1,5 @@
 BOT_TOKEN = '7685483291:AAHWaSSCBdCU1ZT0BFeoPHEyMIEPJJvzVDw'
-CHANNEL_ID = '@sortfess'   # ganti dengan username channel menfess kamu
+CHANNEL_ID = -1002538940104   # ganti dengan username channel menfess kamu
 ADMIN_IDS = {1538087933, 7608777733} # ganti dengan Telegram ID admin
 REQUIRED_CHANNELS = ['@sortfess', '@fiIIyourheart']
 
