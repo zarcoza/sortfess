@@ -4,6 +4,7 @@ from aiogram.types import (
     CallbackQuery
 )
 from aiogram.filters import Command, Filter
+from aiogram import F  # ⬅️ tambahkan ini
 from db import add_user
 from config import REQUIRED_CHANNELS, VALID_HASHTAGS
 
