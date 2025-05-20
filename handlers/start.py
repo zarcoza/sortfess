@@ -40,7 +40,7 @@ async def start_cmd(message: types.Message) -> None:
         parse_mode="HTML"
     )
 
-@router.callback_query(types.CallbackQuery.filter(lambda c: c.data == "check_sub"))
+@router.callback_query(F.data == "check_sub")
 async def check_subscription(callback: CallbackQuery, bot: Bot):
     user_id = callback.from_user.id
     all_joined = True
