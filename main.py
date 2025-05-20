@@ -21,7 +21,7 @@ dp.include_router(admin_router)
 async def main():
     print("🤖 Bot Sort Menfess sedang berjalan...")
     try:
-        await dp.start_polling(bot, polling_timeout=30)
+        await dp.start_polling(bot)
     except Exception as e:
         print(f"❌ Error saat polling: {e}")
     finally:
