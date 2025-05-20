@@ -16,6 +16,12 @@ def sub_keyboard() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="✦ Done Subscribe", callback_data="check_sub")]
     ])
 
+def info_keyboard() -> InlineKeyboardMarkup:
+    return InlineKeyboardMarkup(inline_keyboard=[
+        [InlineKeyboardButton("✸ Rules", url="https://t.me/sortfess/5")],
+        [InlineKeyboardButton("𖥔 Admin", url="https://t.me/sortfess/6")]
+    ])
+
 def hashtag_info() -> str:
     return "\n".join([f"• <b>{tag}</b> → {desc}" for tag, desc in VALID_HASHTAGS.items()])
 
@@ -56,6 +62,12 @@ async def check_subscription(callback: CallbackQuery, bot: Bot):
     await callback.answer()
     if all_joined:
         await callback.message.edit_reply_markup()
-        await callback.message.answer("☆ Oke kamu sudah subscribe, bisa mulai ngirim menfess yaa!")
+        await callback.message.answer(
+            "☆ Oke kamu sudah subscribe, bisa mulai ngirim menfess yaa!",
+            reply_markup=info_keyboard()
+        )
     else:
-        await callback.message.answer("𖦹 Waduh kamu belum subscribe nih, subscribe dulu yaa!", reply_markup=sub_keyboard())
+        await callback.message.answer(
+            "𖦹 Waduh kamu belum subscribe nih, subscribe dulu yaa!",
+            reply_markup=sub_keyboard()
+        )
