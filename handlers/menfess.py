@@ -65,7 +65,7 @@ async def handle_text_menfess(message: types.Message, bot: Bot):
             f"🔗 User : {mention}"
         )
     else:
-        forward_text = f"{message.text}\n\n🕶 Anonim by: {message.from_user.mention_html()}"
+        forward_text = f"{message.text}"
 
     print("Akan mengirim ke channel:", CHANNEL_ID)
     await bot.send_message(
@@ -104,15 +104,13 @@ async def handle_photo_menfess(message: types.Message, bot: Bot):
     log_post(user_id, caption)
 
     photo = message.photo[-1].file_id
-    print("Akan mengirim foto ke channel:", CHANNEL_ID)
     await bot.send_photo(
         chat_id=CHANNEL_ID,
         photo=photo,
-        caption=f"{caption}\n\n🕶 Anonim by: {message.from_user.mention_html()}",
+        caption=f"{caption}",
         reply_markup=report_keyboard(),
         parse_mode="HTML"
     )
-    print("Sudah mengirim foto ke channel.")
     await message.reply("Pesan kamu sudah dikirim ke base!")
 
 @router.message(F.document)
@@ -137,15 +135,13 @@ async def handle_document_menfess(message: types.Message, bot: Bot):
     count_hashtags(caption)
     log_post(user_id, caption)
 
-    print("Akan mengirim dokumen ke channel:", CHANNEL_ID)
     await bot.send_document(
         chat_id=CHANNEL_ID,
         document=message.document.file_id,
-        caption=f"{caption}\n\n🕶 Anonim by: {message.from_user.mention_html()}",
+        caption=f"{caption}",
         reply_markup=report_keyboard(),
         parse_mode="HTML"
     )
-    print("Sudah mengirim dokumen ke channel.")
     await message.reply("Dokumen kamu sudah dikirim ke base!")
 
 @router.message(F.voice)
@@ -163,19 +159,17 @@ async def handle_voice_menfess(message: types.Message, bot: Bot):
     if not await check_subscription(user_id, bot):
         return await message.reply("Eits, belum subscribe dulu yaa~", reply_markup=sub_keyboard())
 
-    caption = message.caption or "🎤 Voice note dari pengguna anonim"
+    caption = message.caption or ""
     count_hashtags(caption)
     log_post(user_id, caption)
 
-    print("Akan mengirim voice ke channel:", CHANNEL_ID)
     await bot.send_voice(
         chat_id=CHANNEL_ID,
         voice=message.voice.file_id,
-        caption=f"{caption}\n\n🕶 Anonim by: {message.from_user.mention_html()}",
+        caption=f"{caption}",
         reply_markup=report_keyboard(),
         parse_mode="HTML"
     )
-    print("Sudah mengirim voice ke channel.")
     await message.reply("Voice note kamu udah dikirim ke base!")
 
 @router.message(F.sticker)
@@ -193,20 +187,19 @@ async def handle_sticker_menfess(message: types.Message, bot: Bot):
     if not await check_subscription(user_id, bot):
         return await message.reply("Eits, belum subscribe dulu yaa~", reply_markup=sub_keyboard())
 
-    caption = f"🧩 Stiker dari pengguna anonim\n\n🕶 Anonim by: {message.from_user.mention_html()}"
     log_post(user_id, "[STIKER]")
 
-    print("Akan mengirim sticker ke channel:", CHANNEL_ID)
     await bot.send_sticker(
         chat_id=CHANNEL_ID,
         sticker=message.sticker.file_id,
         reply_markup=report_keyboard()
     )
 
-    await bot.send_message(
-        chat_id=CHANNEL_ID,
-        text=caption,
-        parse_mode="HTML"
-    )
-    print("Sudah mengirim sticker ke channel.")
+    # Jika ingin menambah teks di channel untuk stiker, bisa diisi, jika tidak hapus saja yang di bawah.
+    # await bot.send_message(
+    #     chat_id=CHANNEL_ID,
+    #     text=caption,
+    #     parse_mode="HTML"
+    # )
+
     await message.reply("Stiker kamu udah dikirim ke base!")
