@@ -17,6 +17,7 @@ def report_keyboard() -> InlineKeyboardMarkup:
 async def handle_menfess(message: types.Message):
     user_id = message.from_user.id
     username = message.from_user.username or ""
+    full_name = message.from_user.full_name
     text: str = message.text.strip()
 
     # simpan user ke database
@@ -24,7 +25,7 @@ async def handle_menfess(message: types.Message):
 
     # cek status base (buka/tutup)
     if not get_post_status():
-        return await message.reply("Base lagi rehat beb. Nanti balik lagi ya~ 😴")
+        return await message.reply("♬ ˖ ࣪  Base lagi rehat beb. Nanti balik lagi ya~")
 
     # cek langganan channel
     if not await check_subscription(user_id):
@@ -35,7 +36,7 @@ async def handle_menfess(message: types.Message):
 
     # validasi panjang pesan minimal (hindari spam kosong)
     if len(text) < 10:
-        return await message.reply("Pesanmu terlalu pendek kak, coba tambahkan lebih banyak ya~ ✍️")
+        return await message.reply("Pesanmu terlalu pendek kak, coba tambahkan lebih banyak ya~")
 
     # deteksi kata kotor
     if contains_bad_word(text):
@@ -51,12 +52,15 @@ async def handle_menfess(message: types.Message):
     if wrong_tags:
         return await message.reply("Kayaknya ada typo di hashtag kamu deh \nCek lagi yaa!")
 
-    # deteksi #gonna (tampilkan username asli)
-    show_username = '#gonna' in text_lower
-
-    if show_username:
-        mention = f"@{username}" if username else f"<a href='tg://user?id={user_id}'>User Tanpa Username</a>"
-        forward_text = f"{message.text}\n\n📢 Dipost oleh: {mention}"
+    # deteksi #gonna (tampilkan data user)
+    if '#gonna' in text_lower:
+        mention = f"@{username}" if username else f"(tidak ada username)"
+        forward_text = (
+            f"{message.text}\n\n"
+            f"👤 Nama  : {full_name}\n"
+            f"🆔 ID    : <code>{user_id}</code>\n"
+            f"🔗 User : {mention}"
+        )
     else:
         forward_text = f"{message.text}\n\n🕶 Anonim by: {message.from_user.mention_html()}"
 
