@@ -9,7 +9,7 @@ from db import add_user
 from config import REQUIRED_CHANNELS, VALID_HASHTAGS
 
 router = Router()
-BASE_CHANNEL_ID = 2538940104  # ID channel @sortfess
+BASE_CHANNEL_ID = -1002538940104  # ID channel @sortfess
 
 def sub_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
