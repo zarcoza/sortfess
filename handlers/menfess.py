@@ -13,11 +13,6 @@ from db import (
 
 router = Router()
 
-def report_keyboard() -> InlineKeyboardMarkup:
-    return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="★ Laporkan ke Admin", url="https://t.me/anxtariksa")]
-    ])
-
 @router.message(F.text)
 async def handle_text_menfess(message: types.Message, bot: Bot):
     user_id = message.from_user.id
