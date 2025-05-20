@@ -24,18 +24,17 @@ def get_post_status() -> bool:
     """
     return _POST_STATUS["is_open"]
 
-async def check_subscription(user_id: int) -> bool:
+async def check_subscription(user_id: int, bot: Bot) -> bool:
     """
     Memeriksa apakah user sudah subscribe ke semua channel wajib.
 
     Args:
         user_id (int): ID pengguna Telegram.
+        bot (Bot): Instance Bot Telegram.
 
     Returns:
         bool: True jika user sudah subscribe ke semua channel, False jika belum atau gagal cek.
     """
-    bot = Bot.get_current()
-
     for channel_id in REQUIRED_CHANNELS:
         try:
             member: ChatMember = await bot.get_chat_member(chat_id=channel_id, user_id=user_id)
