@@ -10,16 +10,16 @@ router = Router()
 # Tombol subscribe
 def sub_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton("命 ｡ Base Menfess", url="https://t.me/sortfess")],
-        [InlineKeyboardButton("命 ｡ Heart Heart", url="https://t.me/fiIIyourheart")],
-        [InlineKeyboardButton("✦ Done Subscribe", callback_data="check_sub")]
-    ])
+        [InlineKeyboardButton(text="命 ｡ Base Menfess", url="https://t.me/sortfess")],
+        [InlineKeyboardButton(text="命 ｡ Heart Heart", url="https://t.me/fiIIyourheart")],
+        [InlineKeyboardButton(text="✦ Done Subscribe", callback_data="check_sub")]
+        ])
 
 # Tombol info setelah subscribe
 def info_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton("✸ Rules", url="https://t.me/sortfess/5")],
-        [InlineKeyboardButton("𖥔 Admin", url="https://t.me/sortfess/6")]
+    [InlineKeyboardButton(text="✸ Rules", url="https://t.me/sortfess/5")],
+    [InlineKeyboardButton(text="𖥔 Admin", url="https://t.me/sortfess/6")]
     ])
 
 # Format list hashtag
