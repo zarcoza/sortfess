@@ -1,6 +1,6 @@
 import sqlite3
 import os
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Dict
 
 DB_DIR = os.path.join(os.path.dirname(__file__), 'data')
 DB_PATH = os.path.join(DB_DIR, 'users.db')
@@ -29,6 +29,14 @@ def get_all_users() -> List[int]:
         cursor = conn.execute("SELECT id FROM users")
         return [row[0] for row in cursor.fetchall()]
 
+def get_user_by_id(user_id: int) -> Optional[Dict[str, Optional[str]]]:
+    with get_connection() as conn:
+        cur = conn.execute("SELECT id, username FROM users WHERE id = ?", (user_id,))
+        row = cur.fetchone()
+        if row:
+            return {"id": row[0], "username": row[1]}
+        return None
+
 def ban_user(user_id: int):
     with get_connection() as conn:
         conn.execute("INSERT OR IGNORE INTO banned_users (id) VALUES (?)", (user_id,))
@@ -43,6 +51,11 @@ def is_banned(user_id: int) -> bool:
     with get_connection() as conn:
         cur = conn.execute("SELECT 1 FROM banned_users WHERE id = ?", (user_id,))
         return cur.fetchone() is not None
+
+def get_all_banned_users() -> List[int]:
+    with get_connection() as conn:
+        cur = conn.execute("SELECT id FROM banned_users")
+        return [row[0] for row in cur.fetchall()]
 
 def log_post(user_id: int, text: str):
     with get_connection() as conn:
@@ -89,6 +102,11 @@ def get_admin_ids() -> List[int]:
     with get_connection() as conn:
         cur = conn.execute("SELECT id FROM admins")
         return [row[0] for row in cur.fetchall()]
+
+def get_all_admins() -> List[Dict[str, Optional[str]]]:
+    with get_connection() as conn:
+        cur = conn.execute("SELECT a.id, u.username FROM admins a LEFT JOIN users u ON a.id = u.id")
+        return [{"id": row[0], "username": row[1]} for row in cur.fetchall()]
 
 def add_admin_id(user_id: int):
     with get_connection() as conn:
