@@ -7,33 +7,19 @@ from config import REQUIRED_CHANNELS
 _POST_STATUS = {"is_open": True}
 
 def set_post_status(status: bool):
-    """
-    Mengatur status apakah fitur menfess dibuka atau ditutup.
-
-    Args:
-        status (bool): True untuk membuka, False untuk menutup.
-    """
+    """Set status buka/tutup fitur menfess."""
     _POST_STATUS["is_open"] = status
 
 def get_post_status() -> bool:
-    """
-    Mengambil status apakah fitur menfess sedang dibuka.
-
-    Returns:
-        bool: True jika dibuka, False jika ditutup.
-    """
+    """Ambil status buka/tutup fitur menfess."""
     return _POST_STATUS["is_open"]
 
 async def check_subscription(user_id: int, bot: Bot) -> bool:
     """
-    Memeriksa apakah user sudah subscribe ke semua channel wajib.
-
-    Args:
-        user_id (int): ID pengguna Telegram.
-        bot (Bot): Instance Bot Telegram.
+    Cek apakah user sudah subscribe ke semua channel wajib.
 
     Returns:
-        bool: True jika user sudah subscribe ke semua channel, False jika belum atau gagal cek.
+        True jika semua channel disubscribe, False jika ada yang belum atau gagal dicek.
     """
     for channel_id in REQUIRED_CHANNELS:
         try:
@@ -41,10 +27,7 @@ async def check_subscription(user_id: int, bot: Bot) -> bool:
             if member.status not in {"member", "administrator", "creator"}:
                 return False
         except (TelegramForbiddenError, TelegramBadRequest):
-            # Bot tidak punya akses atau channel tidak valid
             return False
         except Exception:
-            # Error tak terduga, asumsikan belum subscribe
             return False
-
     return True
