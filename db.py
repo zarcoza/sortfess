@@ -1,15 +1,18 @@
 import sqlite3
 import os
+import logging
 from typing import List, Optional, Tuple, Dict
 
+# Lokasi database
 DB_DIR = os.path.join(os.path.dirname(__file__), 'data')
 DB_PATH = os.path.join(DB_DIR, 'users.db')
 os.makedirs(DB_DIR, exist_ok=True)
 
 def get_connection() -> sqlite3.Connection:
+    """Buka koneksi SQLite ke database pengguna."""
     return sqlite3.connect(DB_PATH, check_same_thread=False)
 
-# Inisialisasi tabel
+# Inisialisasi skema database
 with get_connection() as conn:
     conn.executescript('''
         CREATE TABLE IF NOT EXISTS users (
@@ -34,10 +37,14 @@ with get_connection() as conn:
     ''')
     conn.commit()
 
-# === Users ===
-def add_user(user_id: int, username: Optional[str]):
+# === USERS ===
+
+def add_user(user_id: int, username: Optional[str]) -> None:
     with get_connection() as conn:
-        conn.execute("INSERT OR IGNORE INTO users (id, username) VALUES (?, ?)", (user_id, username))
+        conn.execute(
+            "INSERT OR IGNORE INTO users (id, username) VALUES (?, ?)",
+            (user_id, username)
+        )
         conn.commit()
 
 def get_user_by_id(user_id: int) -> Optional[Dict[str, Optional[str]]]:
@@ -54,13 +61,14 @@ def get_all_users() -> List[int]:
     with get_connection() as conn:
         return [row[0] for row in conn.execute("SELECT id FROM users").fetchall()]
 
-# === Banned Users ===
-def ban_user(user_id: int):
+# === BANNED USERS ===
+
+def ban_user(user_id: int) -> None:
     with get_connection() as conn:
         conn.execute("INSERT OR IGNORE INTO banned_users (id) VALUES (?)", (user_id,))
         conn.commit()
 
-def unban_user(user_id: int):
+def unban_user(user_id: int) -> None:
     with get_connection() as conn:
         conn.execute("DELETE FROM banned_users WHERE id = ?", (user_id,))
         conn.commit()
@@ -73,28 +81,37 @@ def get_all_banned_users() -> List[int]:
     with get_connection() as conn:
         return [row[0] for row in conn.execute("SELECT id FROM banned_users").fetchall()]
 
-def clear_banlist():
+def clear_banlist() -> None:
     with get_connection() as conn:
         conn.execute("DELETE FROM banned_users")
         conn.commit()
 
-# === Posts ===
-def log_post(user_id: int, text: str):
+# === POSTS ===
+
+def log_post(user_id: int, text: str) -> None:
     with get_connection() as conn:
         conn.execute("INSERT INTO posts (user_id, text) VALUES (?, ?)", (user_id, text))
         conn.commit()
 
 def latest_post(user_id: int) -> Optional[str]:
     with get_connection() as conn:
-        row = conn.execute("SELECT text FROM posts WHERE user_id = ? ORDER BY id DESC LIMIT 1", (user_id,)).fetchone()
+        row = conn.execute(
+            "SELECT text FROM posts WHERE user_id = ? ORDER BY id DESC LIMIT 1",
+            (user_id,)
+        ).fetchone()
         return row[0] if row else None
 
 def get_last_posts(limit: int = 10) -> List[Tuple[int, str]]:
     with get_connection() as conn:
-        return conn.execute("SELECT user_id, text FROM posts ORDER BY id DESC LIMIT ?", (limit,)).fetchall()[::-1]
+        return conn.execute(
+            "SELECT user_id, text FROM posts ORDER BY id DESC LIMIT ?",
+            (limit,)
+        ).fetchall()[::-1]
 
-# === Hashtags ===
-def count_hashtags(text: str):
+# === HASHTAGS ===
+
+def count_hashtags(text: str) -> None:
+    """Perbarui statistik hashtag berdasarkan teks."""
     words = text.lower().split()
     with get_connection() as conn:
         for word in words:
@@ -109,15 +126,19 @@ def count_hashtags(text: str):
 
 def get_top_hashtags(n: int = 5) -> List[Tuple[str, int]]:
     with get_connection() as conn:
-        return conn.execute("SELECT hashtag, count FROM hashtag_stats ORDER BY count DESC LIMIT ?", (n,)).fetchall()
+        return conn.execute(
+            "SELECT hashtag, count FROM hashtag_stats ORDER BY count DESC LIMIT ?",
+            (n,)
+        ).fetchall()
 
-# === Admins ===
-def add_admin_id(user_id: int):
+# === ADMINS ===
+
+def add_admin_id(user_id: int) -> None:
     with get_connection() as conn:
         conn.execute("INSERT OR IGNORE INTO admins (id) VALUES (?)", (user_id,))
         conn.commit()
 
-def remove_admin_id(user_id: int):
+def remove_admin_id(user_id: int) -> None:
     with get_connection() as conn:
         conn.execute("DELETE FROM admins WHERE id = ?", (user_id,))
         conn.commit()
@@ -130,5 +151,7 @@ def get_all_admins() -> List[Dict[str, Optional[str]]]:
     with get_connection() as conn:
         return [
             {"id": row[0], "username": row[1]}
-            for row in conn.execute("SELECT a.id, u.username FROM admins a LEFT JOIN users u ON a.id = u.id").fetchall()
+            for row in conn.execute(
+                "SELECT a.id, u.username FROM admins a LEFT JOIN users u ON a.id = u.id"
+            ).fetchall()
         ]
