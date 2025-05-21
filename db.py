@@ -10,11 +10,13 @@ os.makedirs(DB_DIR, exist_ok=True)
 def get_connection() -> sqlite3.Connection:
     return sqlite3.connect(DB_PATH, check_same_thread=False)
 
+# Inisialisasi tabel
 with get_connection() as conn:
     conn.execute('CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT)')
     conn.execute('CREATE TABLE IF NOT EXISTS banned_users (id INTEGER PRIMARY KEY)')
     conn.execute('CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, text TEXT)')
     conn.execute('CREATE TABLE IF NOT EXISTS hashtag_stats (hashtag TEXT PRIMARY KEY, count INTEGER)')
+    conn.execute('CREATE TABLE IF NOT EXISTS admins (id INTEGER PRIMARY KEY)')
     conn.commit()
 
 def add_user(user_id: int, username: Optional[str]):
@@ -81,3 +83,25 @@ def clear_banlist():
     with get_connection() as conn:
         conn.execute("DELETE FROM banned_users")
         conn.commit()
+
+# === Admin Functions ===
+def get_admin_ids() -> List[int]:
+    with get_connection() as conn:
+        cur = conn.execute("SELECT id FROM admins")
+        return [row[0] for row in cur.fetchall()]
+
+def add_admin_id(user_id: int):
+    with get_connection() as conn:
+        conn.execute("INSERT OR IGNORE INTO admins (id) VALUES (?)", (user_id,))
+        conn.commit()
+
+def remove_admin_id(user_id: int):
+    with get_connection() as conn:
+        conn.execute("DELETE FROM admins WHERE id = ?", (user_id,))
+        conn.commit()
+
+def get_username_by_id(user_id: int) -> Optional[str]:
+    with get_connection() as conn:
+        cur = conn.execute("SELECT username FROM users WHERE id = ?", (user_id,))
+        row = cur.fetchone()
+        return row[0] if row else None
