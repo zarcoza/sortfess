@@ -7,8 +7,9 @@ from config import REQUIRED_CHANNELS, VALID_HASHTAGS
 
 router = Router()
 
-BASE_CHANNEL_ID = -1002538940104
+BASE_CHANNEL_ID = -1002538940104  # ID channel utama, bisa digunakan kalau butuh
 
+# Tombol untuk subscribe
 def sub_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton(text="命 ｡ Base Menfess", url="https://t.me/sortfess")],
@@ -16,15 +17,18 @@ def sub_keyboard() -> InlineKeyboardMarkup:
         [InlineKeyboardButton(text="✦ Done Subscribe", callback_data="check_sub")]
     ])
 
+# Tombol informasi setelah berhasil subscribe
 def info_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton("✸ Rules", url="https://t.me/sortfess/5")],
         [InlineKeyboardButton("𖥔 Admin", url="https://t.me/sortfess/6")]
     ])
 
+# Format hashtag untuk ditampilkan
 def hashtag_info() -> str:
     return "\n".join([f"• <b>{tag}</b> → {desc}" for tag, desc in VALID_HASHTAGS.items()])
 
+# Handle perintah /start
 @router.message(Command("start"))
 async def start_cmd(message: types.Message) -> None:
     add_user(message.from_user.id, message.from_user.username or "")
@@ -44,11 +48,13 @@ async def start_cmd(message: types.Message) -> None:
         parse_mode="HTML"
     )
 
+# Handle tombol "Done Subscribe"
 @router.callback_query(F.data == "check_sub")
 async def check_subscription(callback: CallbackQuery, bot: Bot):
     user_id = callback.from_user.id
     all_joined = True
 
+    # Cek apakah user sudah join semua channel yang disyaratkan
     for channel in REQUIRED_CHANNELS:
         try:
             member = await bot.get_chat_member(chat_id=channel, user_id=user_id)
@@ -60,16 +66,23 @@ async def check_subscription(callback: CallbackQuery, bot: Bot):
             break
 
     await callback.answer()
+
     if all_joined:
-        await callback.message.edit_reply_markup()
-        await callback.message.answer(
-            "☆ Oke kamu sudah subscribe, bisa mulai ngirim menfess yaa!",
+        try:
+            await callback.message.delete()  # Hapus pesan awal (banner)
+        except:
+            pass
+
+        await bot.send_message(
+            chat_id=user_id,
+            text="☆ Oke kamu sudah subscribe, bisa mulai ngirim menfess yaa!",
             reply_markup=info_keyboard(),
             parse_mode="HTML"
         )
     else:
-        await callback.message.answer(
-            "𖦹 Waduh kamu belum subscribe nih, subscribe dulu yaa!",
+        await bot.send_message(
+            chat_id=user_id,
+            text="𖦹 Waduh kamu belum subscribe nih, subscribe dulu yaa!",
             reply_markup=sub_keyboard(),
             parse_mode="HTML"
         )
