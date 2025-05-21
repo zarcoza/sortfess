@@ -5,7 +5,7 @@ from db import (
     get_all_users, get_last_posts, get_top_hashtags,
     ban_user, unban_user, is_banned, latest_post,
     add_admin_id, remove_admin_id, get_admin_ids, get_user_by_id,
-    get_banned_users
+    get_all_banned_users  # ✅ diperbaiki dari get_banned_users
 )
 from utils import set_post_status
 import asyncio
@@ -120,7 +120,7 @@ async def unban_cmd(message: types.Message):
 @router.message(Command("listban"))
 async def list_banned_users(message: types.Message):
     if is_admin(message.from_user.id):
-        banned = get_banned_users()
+        banned = get_all_banned_users()  # ✅ ganti dari get_banned_users()
         if not banned:
             return await message.reply("✅ Tidak ada user yang sedang diblokir.")
         text = "🚫 <b>Daftar User Terblokir:</b>\n" + "\n".join([f"• <code>{uid}</code>" for uid in banned])
