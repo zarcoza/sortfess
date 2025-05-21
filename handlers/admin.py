@@ -1,22 +1,20 @@
 from aiogram import Router, types
 from aiogram.filters import Command
 from aiogram.exceptions import TelegramForbiddenError, TelegramBadRequest
-from config import ADMIN_IDS
 from db import (
     get_all_users, get_last_posts, get_top_hashtags,
     ban_user, unban_user, is_banned, latest_post,
-    add_admin_id, remove_admin_id, get_admin_ids, get_username_by_id
+    add_admin_id, remove_admin_id, get_admin_ids
 )
 from utils import set_post_status
 import asyncio
 import logging
 
 router = Router()
-admin_set = set(ADMIN_IDS)
+admin_set = set(get_admin_ids())
 
 def is_admin(user_id: int) -> bool:
     return user_id in admin_set
-
 
 @router.message(Command("broadcast"))
 async def broadcast_handler(message: types.Message):
@@ -50,7 +48,6 @@ async def broadcast_handler(message: types.Message):
         f"❌ Gagal: {failed}"
     )
 
-
 @router.message(Command("balas"))
 async def reply_user(message: types.Message):
     if not is_admin(message.from_user.id):
@@ -68,7 +65,6 @@ async def reply_user(message: types.Message):
     except Exception as e:
         await message.reply(f"❌ Gagal kirim pesan ke user.\n<code>{e}</code>", parse_mode="HTML")
 
-
 @router.message(Command("tutup"))
 async def tutup_base(message: types.Message):
     if not is_admin(message.from_user.id):
@@ -76,7 +72,6 @@ async def tutup_base(message: types.Message):
 
     set_post_status(False)
     await message.reply("✋ Base ditutup dulu yaa, istirahat sejenak.")
-
 
 @router.message(Command("buka"))
 async def buka_base(message: types.Message):
@@ -86,7 +81,6 @@ async def buka_base(message: types.Message):
     set_post_status(True)
     await message.reply("✅ Base sudah dibuka lagi, gaskeun!")
 
-
 @router.message(Command("stat"))
 async def show_stats(message: types.Message):
     if not is_admin(message.from_user.id):
@@ -94,7 +88,6 @@ async def show_stats(message: types.Message):
 
     total = len(get_all_users())
     await message.reply(f"📊 Jumlah total pengguna: <b>{total}</b>", parse_mode="HTML")
-
 
 @router.message(Command("help_admin"))
 async def help_admin(message: types.Message):
@@ -122,7 +115,6 @@ async def help_admin(message: types.Message):
     )
     await message.reply(help_text, parse_mode="HTML")
 
-
 @router.message(Command("ban"))
 async def ban_cmd(message: types.Message):
     if not is_admin(message.from_user.id):
@@ -135,7 +127,6 @@ async def ban_cmd(message: types.Message):
     uid = int(parts[1])
     ban_user(uid)
     await message.reply(f"🚫 User <code>{uid}</code> telah diblokir.", parse_mode="HTML")
-
 
 @router.message(Command("unban"))
 async def unban_cmd(message: types.Message):
@@ -150,7 +141,6 @@ async def unban_cmd(message: types.Message):
     unban_user(uid)
     await message.reply(f"✅ User <code>{uid}</code> telah diizinkan kembali.", parse_mode="HTML")
 
-
 @router.message(Command("last10"))
 async def last_10_posters(message: types.Message):
     if not is_admin(message.from_user.id):
@@ -162,7 +152,6 @@ async def last_10_posters(message: types.Message):
 
     result = "\n\n".join([f"<b>{uid}</b>:\n{text[:200]}" for uid, text in posts])
     await message.reply(f"🕵️‍♂️ Riwayat Pengirim Terakhir:\n\n{result}", parse_mode="HTML")
-
 
 @router.message(Command("tophashtag"))
 async def top_hashtag(message: types.Message):
