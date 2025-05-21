@@ -7,33 +7,31 @@ from config import REQUIRED_CHANNELS, VALID_HASHTAGS
 
 router = Router()
 
-BASE_CHANNEL_ID = -1002538940104  # ID channel utama, bisa digunakan kalau butuh
-
-# Tombol untuk subscribe
+# Tombol subscribe
 def sub_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
-        [InlineKeyboardButton(text="命 ｡ Base Menfess", url="https://t.me/sortfess")],
-        [InlineKeyboardButton(text="命 ｡ Heart Heart", url="https://t.me/fiIIyourheart")],
-        [InlineKeyboardButton(text="✦ Done Subscribe", callback_data="check_sub")]
+        [InlineKeyboardButton("命 ｡ Base Menfess", url="https://t.me/sortfess")],
+        [InlineKeyboardButton("命 ｡ Heart Heart", url="https://t.me/fiIIyourheart")],
+        [InlineKeyboardButton("✦ Done Subscribe", callback_data="check_sub")]
     ])
 
-# Tombol informasi setelah berhasil subscribe
+# Tombol info setelah subscribe
 def info_keyboard() -> InlineKeyboardMarkup:
     return InlineKeyboardMarkup(inline_keyboard=[
         [InlineKeyboardButton("✸ Rules", url="https://t.me/sortfess/5")],
         [InlineKeyboardButton("𖥔 Admin", url="https://t.me/sortfess/6")]
     ])
 
-# Format hashtag untuk ditampilkan
+# Format list hashtag
 def hashtag_info() -> str:
     return "\n".join([f"• <b>{tag}</b> → {desc}" for tag, desc in VALID_HASHTAGS.items()])
 
-# Handle perintah /start
+# Handle /start
 @router.message(Command("start"))
-async def start_cmd(message: types.Message) -> None:
+async def start_cmd(message: types.Message):
     add_user(message.from_user.id, message.from_user.username or "")
 
-    caption_text = (
+    caption = (
         "<b>⾕ — Welcome to Sort Menfess!</b>\n\n"
         "Mau kirim confess buat orang? Pengakuan? Sambat? Atau bahkan cerita hal diluar nurul?\n"
         "Gampang kok! Cukup pake hashtag sesuai jenisnya:\n\n"
@@ -43,46 +41,52 @@ async def start_cmd(message: types.Message) -> None:
 
     await message.answer_photo(
         photo="https://raw.githubusercontent.com/zarcoza/sortfess/main/banner.png",
-        caption=caption_text,
+        caption=caption,
         reply_markup=sub_keyboard(),
         parse_mode="HTML"
     )
 
-# Handle tombol "Done Subscribe"
+# Handle tombol "✦ Done Subscribe"
 @router.callback_query(F.data == "check_sub")
 async def check_subscription(callback: CallbackQuery, bot: Bot):
     user_id = callback.from_user.id
     all_joined = True
 
-    # Cek apakah user sudah join semua channel yang disyaratkan
     for channel in REQUIRED_CHANNELS:
         try:
             member = await bot.get_chat_member(chat_id=channel, user_id=user_id)
             if member.status in ["left", "kicked"]:
                 all_joined = False
                 break
-        except:
+        except Exception as e:
+            print(f"Error checking subscription: {e}")
             all_joined = False
             break
 
     await callback.answer()
 
+    try:
+        await callback.message.delete()
+    except:
+        pass
+
     if all_joined:
         try:
-            await callback.message.delete()  # Hapus pesan awal (banner)
-        except:
-            pass
-
-        await bot.send_message(
-            chat_id=user_id,
-            text="☆ Oke kamu sudah subscribe, bisa mulai ngirim menfess yaa!",
-            reply_markup=info_keyboard(),
-            parse_mode="HTML"
-        )
+            await bot.send_message(
+                chat_id=user_id,
+                text="☆ Oke kamu sudah subscribe, bisa mulai ngirim menfess yaa!",
+                reply_markup=info_keyboard(),
+                parse_mode="HTML"
+            )
+        except Exception as e:
+            print(f"Gagal kirim pesan ke user: {e}")
     else:
-        await bot.send_message(
-            chat_id=user_id,
-            text="𖦹 Waduh kamu belum subscribe nih, subscribe dulu yaa!",
-            reply_markup=sub_keyboard(),
-            parse_mode="HTML"
-        )
+        try:
+            await bot.send_message(
+                chat_id=user_id,
+                text="𖦹 Waduh kamu belum subscribe nih, subscribe dulu yaa!",
+                reply_markup=sub_keyboard(),
+                parse_mode="HTML"
+            )
+        except Exception as e:
+            print(f"Gagal kirim pesan ke user: {e}")
